@@ -5,13 +5,37 @@
   
   <title>[ActionScript 3] 发个小玩意，可能会用于图形汇集成文本的应用 | 高大魔王</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+  <meta name="description" content="效果就是这样的。写了一个类，返回点的数组，可以用任何文字，但是点间距最好不要写大。。写大就不像这个字了类似这样。。
+package com
+{
+    import flash.display.Bitmap;
+    import flash.display.BitmapData;
+    import flash.display.Sprite;
+    import flash.geom.Poi">
+<meta property="og:type" content="article">
 <meta property="og:title" content="[ActionScript 3] 发个小玩意，可能会用于图形汇集成文本的应用">
 <meta property="og:url" content="http://yoursite.com/2016/10/25/ActionScript-3-发个小玩意，可能会用于图形汇集成文本的应用/index.html">
 <meta property="og:site_name" content="高大魔王">
-<meta property="og:updated_time" content="2016-10-25T04:01:17.000Z">
+<meta property="og:description" content="效果就是这样的。写了一个类，返回点的数组，可以用任何文字，但是点间距最好不要写大。。写大就不像这个字了类似这样。。
+package com
+{
+    import flash.display.Bitmap;
+    import flash.display.BitmapData;
+    import flash.display.Sprite;
+    import flash.geom.Poi">
+<meta property="og:image" content="http://gao11.cn/blog/content/uploadfile/201605/thum-c9a31462881468.jpg">
+<meta property="og:image" content="http://gao11.cn/blog/content/uploadfile/201605/thum-01c01462881471.jpg">
+<meta property="og:updated_time" content="2016-10-25T04:36:01.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="[ActionScript 3] 发个小玩意，可能会用于图形汇集成文本的应用">
+<meta name="twitter:description" content="效果就是这样的。写了一个类，返回点的数组，可以用任何文字，但是点间距最好不要写大。。写大就不像这个字了类似这样。。
+package com
+{
+    import flash.display.Bitmap;
+    import flash.display.BitmapData;
+    import flash.display.Sprite;
+    import flash.geom.Poi">
+<meta name="twitter:image" content="http://gao11.cn/blog/content/uploadfile/201605/thum-c9a31462881468.jpg">
   
     <link rel="alternative" href="/atom.xml" title="高大魔王" type="application/atom+xml">
   
@@ -69,11 +93,128 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p><img src="http://gao11.cn/blog/content/uploadfile/201605/thum-c9a31462881468.jpg" alt="QQ图片20141031164457.jpg"><br>效果就是这样的。写了一个类，返回点的数组，可以用任何文字，但是点间距最好不要写大。。写大就不像这个字了<br><img src="http://gao11.cn/blog/content/uploadfile/201605/thum-01c01462881471.jpg" alt="QQ图片20141031165020.jpg"><br>类似这样。。</p>
+<pre><code>package com
+{
+    import flash.display.Bitmap;
+    import flash.display.BitmapData;
+    import flash.display.Sprite;
+    import flash.geom.Point;
+    import flash.geom.Rectangle;
+    import flash.text.TextField;
+
+    public class AniMain extends Sprite
+    {
+        private static var txt:TextField=new TextField();
+        private static var _bit:BitmapData;
+        private static var _bmp:Bitmap;
+        private static var _algin:String;
+        private static var _rectH:int;
+        private static var _rectW:int;
+        /**
+         *白色原始图片 
+         */        
+        private static var _bit2:BitmapData;
+        /**
+         *复制的图片 
+         */        
+        private static var _bit3:BitmapData;
+        /**
+         *绘制整个场景
+         */        
+        private static var _bit4:BitmapData;
+        /**
+         * 
+         *po
+         */
+        private static var po:Point=new Point(0,0);
+        private static var po2:Point=new Point();
+        private static var rect:Rectangle=new Rectangle(1,1);
+        private static var arr:Array=new Array();
+        public function AniMain()
+        {
+            super();
+        }
+        public static function goPlay(dis:Sprite,str:String=&quot;一生一世都爱你&quot;,_w:int=-1,_h:int=-1):Array
+        {
+            txt.text=str;
+            txt.width=txt.textWidth+3;
+            txt.height=txt.textHeight+4;
+            txt.defaultTextFormat.color=0;
+            _bit=new BitmapData(txt.width,txt.height);
+            _bit.draw(txt);
+            _bmp=new Bitmap(_bit);
+            _algin=_bmp.height&gt;_bmp.width?&quot;height&quot;:&quot;width&quot;;
+            if(_algin==&quot;height&quot;)
+            {
+                _bmp.width=(dis.stage.stageHeight/_bmp.height)*_bmp.width;
+                _bmp.height=dis.stage.stageHeight;
+
+            }
+            else
+            {
+                _bmp.height=(dis.stage.stageWidth/_bmp.width)*_bmp.height;
+                _bmp.width=dis.stage.stageWidth;
+
+            }
+            _bmp.x=(dis.stage.stageWidth-_bmp.width)/2;
+            _bmp.y=(dis.stage.stageHeight-_bmp.height)/2;
+            if(_w==-1&amp;&amp;_h==-1)
+            {
+            _rectH=_bmp.height/_bmp.bitmapData.height;
+            _rectW=_bmp.width/_bmp.bitmapData.width;
+            }
+            else
+            {
+                _rectH=_h;
+                _rectW=_w;
+            }
+            rect.width=_rectW;
+            rect.height=_rectH;
+            dis.addChild(_bmp);
+            _bmp.alpha=1;
+            _bit4=new BitmapData(dis.stage.stageWidth,dis.stage.stageHeight);
+            _bit4.draw(dis);
+            _bit2=new BitmapData(_rectW,_rectH,true,0xffffff);
+            arr=[];
+            for(var i:int=0;i&lt;_bit4.height;i+=_rectH)
+            {
+                for(var j:int=0;j&lt;_bit4.width;j+=_rectW)
+                {
+                    rect.x=j;
+                    rect.y=i;
+                    _bit2.copyPixels(_bit4,rect,po2);
+
+                    if(isHave(_bit2))
+                    {
+                        arr.push([rect.x,rect.y]);
+                    }
+                }
+            }
+            return arr;
+        }
+        private static function isHave(bit:BitmapData):Boolean
+        {
+            for(var i:int=0;i&lt;bit.width;i++)
+            {
+                for(var j:int=0;j&lt;bit.height;j++)
+                {
+                    if(bit.getPixel(i,j)==0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+}
+</code></pre><p>源码献上</p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/ActionScript-3-发个小玩意，可能会用于图形汇集成文本的应用/" data-id="ciuozunff0001lk0l9qkb0rm6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/ActionScript-3-发个小玩意，可能会用于图形汇集成文本的应用/" data-id="ciup03k3j0000s90lxq0b9q8g" class="article-share-link">Share</a>
       
       
     </footer>

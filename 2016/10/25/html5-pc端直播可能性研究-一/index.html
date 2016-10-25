@@ -5,13 +5,22 @@
   
   <title>html5 pc端直播可能性研究 (一) | 高大魔王</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+  <meta name="description" content="前两天,chrome宣布,即将主动屏蔽flash,所有视频网站如果有html5形式的就默认使用html5,如果没有,则由客户选择是否开启.....简直不给flash留活路,我的大flash.......adobe真是作大死..
+牢骚归牢骚,但是饭还是得吃...万一flash真跪了,那网页端的视频直播怎么搞是个问题.
+html5在手机端,可以直接加载.m3u8的文件进行视频直播,延迟较高,但是手机端">
+<meta property="og:type" content="article">
 <meta property="og:title" content="html5 pc端直播可能性研究 (一)">
 <meta property="og:url" content="http://yoursite.com/2016/10/25/html5-pc端直播可能性研究-一/index.html">
 <meta property="og:site_name" content="高大魔王">
-<meta property="og:updated_time" content="2016-10-25T04:00:42.000Z">
+<meta property="og:description" content="前两天,chrome宣布,即将主动屏蔽flash,所有视频网站如果有html5形式的就默认使用html5,如果没有,则由客户选择是否开启.....简直不给flash留活路,我的大flash.......adobe真是作大死..
+牢骚归牢骚,但是饭还是得吃...万一flash真跪了,那网页端的视频直播怎么搞是个问题.
+html5在手机端,可以直接加载.m3u8的文件进行视频直播,延迟较高,但是手机端">
+<meta property="og:updated_time" content="2016-10-25T04:36:41.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="html5 pc端直播可能性研究 (一)">
+<meta name="twitter:description" content="前两天,chrome宣布,即将主动屏蔽flash,所有视频网站如果有html5形式的就默认使用html5,如果没有,则由客户选择是否开启.....简直不给flash留活路,我的大flash.......adobe真是作大死..
+牢骚归牢骚,但是饭还是得吃...万一flash真跪了,那网页端的视频直播怎么搞是个问题.
+html5在手机端,可以直接加载.m3u8的文件进行视频直播,延迟较高,但是手机端">
   
     <link rel="alternative" href="/atom.xml" title="高大魔王" type="application/atom+xml">
   
@@ -69,11 +78,17 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <pre><code>前两天,chrome宣布,即将主动屏蔽flash,所有视频网站如果有html5形式的就默认使用html5,如果没有,则由客户选择是否开启.....简直不给flash留活路,我的大flash.......adobe真是作大死..
+牢骚归牢骚,但是饭还是得吃...万一flash真跪了,那网页端的视频直播怎么搞是个问题.
+html5在手机端,可以直接加载.m3u8的文件进行视频直播,延迟较高,但是手机端可用,但是pc端不支持html5直播啊.
+我就去油管上看了看油管的直播,根据network查看,看到了很多有用的信息.youtube也是通过加载切片形式来直播的,video标签里面,src播放的blob大数据,由此推测,youtube是依次下载切片,然后把每一个分片通过js解码输入到blob大数据中,让video标签实现直播的功能,但是这样做视频延迟也非常高,大概35秒左右,在pc网页端是个大问题.
+另外一种html5直播的方式是通过websocket方式进行直播,后台把音视频数据通过websocket发给网页端,网页端进行解码,这种方式延迟可以保证,但是对于服务器压力非常大,长连接数量多了不是闹着玩的.
+未完待续...
+</code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/html5-pc端直播可能性研究-一/" data-id="ciuozunfx0005lk0l86tdlh4w" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/html5-pc端直播可能性研究-一/" data-id="ciup03k3u0004s90lzo9am2q4" class="article-share-link">Share</a>
       
       
     </footer>

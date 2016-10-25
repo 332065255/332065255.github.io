@@ -5,13 +5,24 @@
   
   <title>基于flv编码,来实现某些数据的直播数据时间同步问题 | 高大魔王</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+  <meta name="description" content="本文章需要的技术有:flv编码
+现在的在线教育领域中,直播系统不仅仅发送视频,通常也伴随着控制数据的发送,例如:翻页,画图等数据,直播发起者在直播的过程中发送的视频数据,需要通过rtmp服务器进行传输,而直播过程中发送的控制数据,是通过tcp/ip的socket长连接,把数据发送到直播观看者的终端.视频数据和控制数据分别走的两条路线,如下图所示.图示:     现有的解决方案,因为发送视频和发送数">
+<meta property="og:type" content="article">
 <meta property="og:title" content="基于flv编码,来实现某些数据的直播数据时间同步问题">
 <meta property="og:url" content="http://yoursite.com/2016/10/25/基于flv编码-来实现某些数据的直播数据时间同步问题/index.html">
 <meta property="og:site_name" content="高大魔王">
-<meta property="og:updated_time" content="2016-10-25T04:01:40.000Z">
+<meta property="og:description" content="本文章需要的技术有:flv编码
+现在的在线教育领域中,直播系统不仅仅发送视频,通常也伴随着控制数据的发送,例如:翻页,画图等数据,直播发起者在直播的过程中发送的视频数据,需要通过rtmp服务器进行传输,而直播过程中发送的控制数据,是通过tcp/ip的socket长连接,把数据发送到直播观看者的终端.视频数据和控制数据分别走的两条路线,如下图所示.图示:     现有的解决方案,因为发送视频和发送数">
+<meta property="og:image" content="http://gao111.top/blog/content/uploadfile/201605/41be1462880327.png">
+<meta property="og:image" content="http://gao111.top/blog/content/uploadfile/201605/thum-9a971462880330.png">
+<meta property="og:image" content="http://gao111.top/blog/content/uploadfile/201605/c36f1462880326.png">
+<meta property="og:image" content="http://gao111.top/blog/content/uploadfile/201605/thum-e6a41462880331.png">
+<meta property="og:updated_time" content="2016-10-25T04:35:49.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于flv编码,来实现某些数据的直播数据时间同步问题">
+<meta name="twitter:description" content="本文章需要的技术有:flv编码
+现在的在线教育领域中,直播系统不仅仅发送视频,通常也伴随着控制数据的发送,例如:翻页,画图等数据,直播发起者在直播的过程中发送的视频数据,需要通过rtmp服务器进行传输,而直播过程中发送的控制数据,是通过tcp/ip的socket长连接,把数据发送到直播观看者的终端.视频数据和控制数据分别走的两条路线,如下图所示.图示:     现有的解决方案,因为发送视频和发送数">
+<meta name="twitter:image" content="http://gao111.top/blog/content/uploadfile/201605/41be1462880327.png">
   
     <link rel="alternative" href="/atom.xml" title="高大魔王" type="application/atom+xml">
   
@@ -69,11 +80,17 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>本文章需要的技术有:flv编码</p>
+<p>现在的在线教育领域中,直播系统不仅仅发送视频,通常也伴随着控制数据的发送,例如:翻页,画图等数据,直播发起者在直播的过程中发送的视频数据,需要通过rtmp服务器进行传输,而直播过程中发送的控制数据,是通过tcp/ip的socket长连接,把数据发送到直播观看者的终端.视频数据和控制数据分别走的两条路线,如下图所示.<br>图示:<br><img src="http://gao111.top/blog/content/uploadfile/201605/41be1462880327.png" alt="4FA1E5D5-5EF9-4AB6-9FC6-6B4B9E1A3E60.png"><br>     现有的解决方案,因为发送视频和发送数据分别使用了两条发送线路,网络不稳定,视频传输要比普通控制数据耗时长,两条线路的传输质量不同,导致出现延迟等,结果就是x1+x2 ≠ y1+y2</p>
+<p>本提案需要解决的技术问题就是,让视频数据与控制数据同步到达观看者的终端      x1+x2 = y1+y2;<br>解决方法如下:<br>     1 要解决这个问题,要把两条传输线路合并为一条,就可以解决网络层级的不确定性.<br>2首先,先来看一下flv编码的格式<br>图示: <img src="http://gao111.top/blog/content/uploadfile/201605/thum-9a971462880330.png" alt="CBAB2C58-D5F3-4FB6-8B88-73470F2CDC65.png"><br>3.可以看出,一个flv文件中,只有一个文件头,和很多个标签组成,我们所看到的视频和听到的声音是视频标签和声音标签所解析的.</p>
+<p>4.而脚本标签,是可以发送基本数据的标签,包括数字,字符等数据.该脚本标签,现在的网页播放器中,只有actionscript技术才能解码运行这个标签.</p>
+<p>5.为了解决x1+x2=y1+y2,我们需要把2条的传输线路合并为1条传输线路,如图示<br><img src="http://gao111.top/blog/content/uploadfile/201605/c36f1462880326.png" alt="0E4A3E05-87F7-4F5E-A0C9-E36A5389CD7A.png"><br>6.我们把要发送的数据,插入进flv视频中,如下图所示<br><img src="http://gao111.top/blog/content/uploadfile/201605/thum-e6a41462880331.png" alt="EB4CA6C7-EEFF-4AC4-A7D1-CE2A05A44FCE.png"><br>7.这样,发送的数据,就和视频同一时间到达观看者的终端中</p>
+<p>8.解析控制数据标签,观看者终端播放这个flv格式的视频,按照flv播放的时间轴行进,如果解码碰到控制数据标签,即可以运行发送端发过来的控制数据,而这个控制数据,就是和视频在同一个时间轴中,不会出现提前或者延迟执行的情况.</p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/基于flv编码-来实现某些数据的直播数据时间同步问题/" data-id="ciuozung80009lk0lkylozxfq" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/基于flv编码-来实现某些数据的直播数据时间同步问题/" data-id="ciup03k470009s90lnl289ez5" class="article-share-link">Share</a>
       
       
     </footer>

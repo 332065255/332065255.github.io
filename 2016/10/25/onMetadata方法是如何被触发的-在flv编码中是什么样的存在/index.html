@@ -5,13 +5,25 @@
   
   <title>onMetadata方法是如何被触发的,在flv编码中是什么样的存在 | 高大魔王</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+  <meta name="description" content="首先来看一下flv编码中metadata标签的16进制数据
+
+从第一个字节开始分析,0x12  :script data  ///这是一个脚本标签0x00 00 B7 ///代表了body大小0x00 00 00 00 //基础时间戳+扩展时间戳0x00 00 00 //代表了streamid 这个总是0以上是Tag header的分析下面进入Tag body分析0x02 //表示amf包类型,0">
+<meta property="og:type" content="article">
 <meta property="og:title" content="onMetadata方法是如何被触发的,在flv编码中是什么样的存在">
 <meta property="og:url" content="http://yoursite.com/2016/10/25/onMetadata方法是如何被触发的-在flv编码中是什么样的存在/index.html">
 <meta property="og:site_name" content="高大魔王">
-<meta property="og:updated_time" content="2016-10-25T04:01:04.000Z">
+<meta property="og:description" content="首先来看一下flv编码中metadata标签的16进制数据
+
+从第一个字节开始分析,0x12  :script data  ///这是一个脚本标签0x00 00 B7 ///代表了body大小0x00 00 00 00 //基础时间戳+扩展时间戳0x00 00 00 //代表了streamid 这个总是0以上是Tag header的分析下面进入Tag body分析0x02 //表示amf包类型,0">
+<meta property="og:image" content="http://s3.tupianku.com/view/large/10458/A6DDDD3CF83AED10B8E9D151A12D6BA2.jpg">
+<meta property="og:image" content="http://s3.tupianku.com/view/large/10458/37A37DA4-A5C5-4663-8587-733A77BE0F3D.png">
+<meta property="og:updated_time" content="2016-10-25T04:36:51.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="onMetadata方法是如何被触发的,在flv编码中是什么样的存在">
+<meta name="twitter:description" content="首先来看一下flv编码中metadata标签的16进制数据
+
+从第一个字节开始分析,0x12  :script data  ///这是一个脚本标签0x00 00 B7 ///代表了body大小0x00 00 00 00 //基础时间戳+扩展时间戳0x00 00 00 //代表了streamid 这个总是0以上是Tag header的分析下面进入Tag body分析0x02 //表示amf包类型,0">
+<meta name="twitter:image" content="http://s3.tupianku.com/view/large/10458/A6DDDD3CF83AED10B8E9D151A12D6BA2.jpg">
   
     <link rel="alternative" href="/atom.xml" title="高大魔王" type="application/atom+xml">
   
@@ -69,11 +81,14 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>首先来看一下flv编码中metadata标签的16进制数据</p>
+<p><img src="http://s3.tupianku.com/view/large/10458/A6DDDD3CF83AED10B8E9D151A12D6BA2.jpg" alt="此处输入图片的描述"></p>
+<p>从第一个字节开始分析,<br>0x12  :script data  ///这是一个脚本标签<br>0x00 00 B7 ///代表了body大小<br>0x00 00 00 00 //基础时间戳+扩展时间戳<br>0x00 00 00 //代表了streamid 这个总是0<br>以上是Tag header的分析<br>下面进入Tag body分析<br>0x02 //表示amf包类型,0x02是字符串类型<br>0x00 0A //代表字符串的长度<br>0x6F 6E 4D 65 74 61 44 61 74 61 //翻译过来就是 o n M e t a D a t a    Ps 是不是很熟悉,这就是onMetaData方法<br>0x08  //代表amf包类型,0x08是一个数组类型<br>0x00 00 00 08 //代表数组长度 这的值为8长度<br>下面开始解析键值对<br>键解析:<br>0x00 08//第一个元素的key的长度 为8<br>0x64 75 72 61 74 69 6F 6E //翻译过来就是d u r a t i o n   Ps 这就是时长的字段<br>值解析:<br><img src="http://s3.tupianku.com/view/large/10458/37A37DA4-A5C5-4663-8587-733A77BE0F3D.png" alt="此处输入图片的描述"><br>0x00  // double双精度浮点类型<br>0x40 24 2b 02 0C 49 BA 5E //双精度 IEEE 754 浮点数  浮点数换算<a href="http://baike.baidu.com/link?url=6irpuDDtpbkiiHmSBgVzZVdD5PBDbA_0XeNRZONgBitjrWAexefyz0kzEqcvbC64BrowPJ2vi3LHJmHu4Jlr7VDoqHUDh_UKs1SHVAC9bHU61LpdAv4GmkSo1VEHR2ecWpbQR_e1FB99EeGqwjlAeXTsH-RZm5dS8_InlXFFKY3" target="_blank" rel="external">http://baike.baidu.com/link?url=6irpuDDtpbkiiHmSBgVzZVdD5PBDbA_0XeNRZONgBitjrWAexefyz0kzEqcvbC64BrowPJ2vi3LHJmHu4Jlr7VDoqHUDh_UKs1SHVAC9bHU61LpdAv4GmkSo1VEHR2ecWpbQR_e1FB99EeGqwjlAeXTsH-RZm5dS8_InlXFFKY3</a><br>0x00 05 //第二个key的长度<br>0x77 69 64 74 68 //翻译过来就是w i d t h  这就是视频的宽度<br>0x00  // double双精度浮点类型<br>0x40 74  00 00 00 00 00 00//双精度 IEEE 754 浮点数 宽度的值<br>0x 00 06//第三个key的长度<br>0x 68 65 69 57 68 74 //双精度 IEEE 754 浮点数 翻译过来 h e i g h t 这就是视频的高度<br>……………..略</p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/onMetadata方法是如何被触发的-在flv编码中是什么样的存在/" data-id="ciuozung20007lk0lvf87i7cv" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/onMetadata方法是如何被触发的-在flv编码中是什么样的存在/" data-id="ciup03k3z0006s90luupd9qjv" class="article-share-link">Share</a>
       
       
     </footer>

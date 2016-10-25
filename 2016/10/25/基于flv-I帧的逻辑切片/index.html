@@ -5,13 +5,21 @@
   
   <title>基于flv I帧的逻辑切片 | 高大魔王</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+  <meta name="description" content="现在视频点播领域,播放点播视频,大部分解决方案都是一开始播放,视频就会完全下载.如下图图示:         只要用户一旦开始播放某个视频,那么这个视频就会完全下载下来.四、现有技术的缺点及本申请提案要解决的技术问题     现有的点播解决方案,一个视频如果有200mb大小,10分钟的市场,用户只观看了1分钟,那么完全下载完毕,就会浪费掉180mb的流量,而用户并没有看后面的9分钟,导致流量白白浪">
+<meta property="og:type" content="article">
 <meta property="og:title" content="基于flv I帧的逻辑切片">
 <meta property="og:url" content="http://yoursite.com/2016/10/25/基于flv-I帧的逻辑切片/index.html">
 <meta property="og:site_name" content="高大魔王">
-<meta property="og:updated_time" content="2016-10-25T04:01:29.000Z">
+<meta property="og:description" content="现在视频点播领域,播放点播视频,大部分解决方案都是一开始播放,视频就会完全下载.如下图图示:         只要用户一旦开始播放某个视频,那么这个视频就会完全下载下来.四、现有技术的缺点及本申请提案要解决的技术问题     现有的点播解决方案,一个视频如果有200mb大小,10分钟的市场,用户只观看了1分钟,那么完全下载完毕,就会浪费掉180mb的流量,而用户并没有看后面的9分钟,导致流量白白浪">
+<meta property="og:image" content="http://gao111.top/blog/content/uploadfile/201605/c48e1462880565.png">
+<meta property="og:image" content="http://gao111.top/blog/content/uploadfile/201605/d6fb1462880566.png">
+<meta property="og:image" content="http://gao111.top/blog/content/uploadfile/201605/7b851462880566.png">
+<meta property="og:image" content="http://gao111.top/blog/content/uploadfile/201605/f7bf1462880568.png">
+<meta property="og:updated_time" content="2016-10-25T04:34:59.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于flv I帧的逻辑切片">
+<meta name="twitter:description" content="现在视频点播领域,播放点播视频,大部分解决方案都是一开始播放,视频就会完全下载.如下图图示:         只要用户一旦开始播放某个视频,那么这个视频就会完全下载下来.四、现有技术的缺点及本申请提案要解决的技术问题     现有的点播解决方案,一个视频如果有200mb大小,10分钟的市场,用户只观看了1分钟,那么完全下载完毕,就会浪费掉180mb的流量,而用户并没有看后面的9分钟,导致流量白白浪">
+<meta name="twitter:image" content="http://gao111.top/blog/content/uploadfile/201605/c48e1462880565.png">
   
     <link rel="alternative" href="/atom.xml" title="高大魔王" type="application/atom+xml">
   
@@ -69,11 +77,17 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>现在视频点播领域,播放点播视频,大部分解决方案都是一开始播放,视频就会完全下载.如下图<br>图示:<br>    <img src="http://gao111.top/blog/content/uploadfile/201605/c48e1462880565.png" alt="图片 1.png"><br>     只要用户一旦开始播放某个视频,那么这个视频就会完全下载下来.<br>四、现有技术的缺点及本申请提案要解决的技术问题<br>     现有的点播解决方案,一个视频如果有200mb大小,10分钟的市场,用户只观看了1分钟,那么完全下载完毕,就会浪费掉180mb的流量,而用户并没有看后面的9分钟,导致流量白白浪费.<br>本方法主要解决的就是,根据用户观看时长,逐步下载视频,防止用户中间关闭视频,浪费流量的情况.<br>五、本申请提案的技术方案的详细阐述<br>1  要解决这个问题,要应用flv文件本身的关键帧的原理,来按需加载这个flv视频文件.<br>2  flv视频文件有关键帧I帧(以下简称为I帧),每个flv视频都有I帧,标准的flv视频文件是2秒一个I帧,每个flv视频一共包含多少个I帧,会标明在flv视频文件头中.如下图所示<br>图示:<br><img src="http://gao111.top/blog/content/uploadfile/201605/d6fb1462880566.png" alt="图片 2.png"></p>
+<ol>
+<li>通过面向对象语言(actionScript)把flv文件头中的I帧信息拿出来,如上图,这个I帧数组长度为N.<br>4 解析这个I帧数组的每一个元素,如下图所示<br>图示:<br><img src="http://gao111.top/blog/content/uploadfile/201605/7b851462880566.png" alt="图片 3.png"><br>5 有了每一个I帧的数据开始位置和数据结束位置,就可以用二进制渐进式下载来下载这个flv文件,假设我们设定的是下载位置在用户所看I帧的后面第4帧,如下图所示<pre><code>图示:
+</code></pre>   <img src="http://gao111.top/blog/content/uploadfile/201605/f7bf1462880568.png" alt="图片 4.png"><pre><code>6 这样通过渐进式下载,用户既不会感觉到视觉上的卡顿等问题,也极大的节约了视频服务器流量消耗,如果用户点开视频,只看了1秒的视频,那么也只浪费一点点流量,不会把整个视频下载下来.
+</code></pre></li>
+</ol>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/基于flv-I帧的逻辑切片/" data-id="ciuozung60008lk0lkzxcg39c" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/基于flv-I帧的逻辑切片/" data-id="ciup03k410007s90lxw2rmnbh" class="article-share-link">Share</a>
       
       
     </footer>

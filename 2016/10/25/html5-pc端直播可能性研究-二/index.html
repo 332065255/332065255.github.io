@@ -5,13 +5,22 @@
   
   <title>html5 pc端直播可能性研究 (二) | 高大魔王</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="article">
+  <meta name="description" content="继续上次的技术研究        本次研究主要是基于youtube的html5直播播放,这种技术便于大规模应用直播,读取静态切片文件,不受限与服务器的连接数.        这个技术的核心api是Mediasource.        首先来看代码        这一段代码是一个加载一个.mp4文件的代码,而直播是加载连续的.mp4文件的片段,道理上是一样的
+
+var video = docum">
+<meta property="og:type" content="article">
 <meta property="og:title" content="html5 pc端直播可能性研究 (二)">
 <meta property="og:url" content="http://yoursite.com/2016/10/25/html5-pc端直播可能性研究-二/index.html">
 <meta property="og:site_name" content="高大魔王">
-<meta property="og:updated_time" content="2016-10-25T04:00:51.000Z">
+<meta property="og:description" content="继续上次的技术研究        本次研究主要是基于youtube的html5直播播放,这种技术便于大规模应用直播,读取静态切片文件,不受限与服务器的连接数.        这个技术的核心api是Mediasource.        首先来看代码        这一段代码是一个加载一个.mp4文件的代码,而直播是加载连续的.mp4文件的片段,道理上是一样的
+
+var video = docum">
+<meta property="og:updated_time" content="2016-10-25T04:36:32.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="html5 pc端直播可能性研究 (二)">
+<meta name="twitter:description" content="继续上次的技术研究        本次研究主要是基于youtube的html5直播播放,这种技术便于大规模应用直播,读取静态切片文件,不受限与服务器的连接数.        这个技术的核心api是Mediasource.        首先来看代码        这一段代码是一个加载一个.mp4文件的代码,而直播是加载连续的.mp4文件的片段,道理上是一样的
+
+var video = docum">
   
     <link rel="alternative" href="/atom.xml" title="高大魔王" type="application/atom+xml">
   
@@ -69,11 +78,55 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <blockquote>
+<p>继续上次的技术研究<br>        本次研究主要是基于youtube的html5直播播放,这种技术便于大规模应用直播,读取静态切片文件,不受限与服务器的连接数.<br>        这个技术的核心api是Mediasource.<br>        首先来看代码<br>        这一段代码是一个加载一个.mp4文件的代码,而直播是加载连续的.mp4文件的片段,道理上是一样的</p>
+</blockquote>
+<pre><code>var video = document.querySelector(&apos;video&apos;);
+
+var assetURL = &apos;frag_bunny.mp4&apos;;    
+// Need to be specific for Blink regarding codecs
+// ./mp4info frag_bunny.mp4 | grep Codec
+var mimeCodec = &apos;video/mp4; codecs=&quot;avc1.42E01E, mp4a.40.2&quot;&apos;;
+
+if (&apos;MediaSource&apos; in window &amp;&amp; MediaSource.isTypeSupported(mimeCodec)) {
+  var mediaSource = new MediaSource;
+  //console.log(mediaSource.readyState); // closed
+  video.src = URL.createObjectURL(mediaSource);
+  mediaSource.addEventListener(&apos;sourceopen&apos;, sourceOpen);
+} else {
+  console.error(&apos;Unsupported MIME type or codec: &apos;, mimeCodec);
+}
+
+function sourceOpen (_) {
+  //console.log(this.readyState); // open
+  var mediaSource = this;
+  var sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
+  fetchAB(assetURL, function (buf) { ///mp4文件加载成功
+    sourceBuffer.addEventListener(&apos;updateend&apos;, function (_) {
+      mediaSource.endOfStream();
+      video.play();
+      //console.log(mediaSource.readyState); // ended
+    });
+    sourceBuffer.appendBuffer(buf); ///把mp4文件追加到对象中
+  });
+};
+
+function fetchAB (url, cb) {    ///加载mp4文件,加载完成后回调方法
+  console.log(url);
+  var xhr = new XMLHttpRequest;
+  xhr.open(&apos;get&apos;, url);
+  xhr.responseType = &apos;arraybuffer&apos;;
+  xhr.onload = function () {
+    cb(xhr.response);
+  };
+  xhr.send();
+};
+</code></pre><p><a href="http://nickdesaulniers.github.io/netfix/demo/bufferAll.html" target="_blank" rel="external">http://nickdesaulniers.github.io/netfix/demo/bufferAll.html</a>      demo的网址</p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/html5-pc端直播可能性研究-二/" data-id="ciuozung00006lk0lpyt665lb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/html5-pc端直播可能性研究-二/" data-id="ciup03k3w0005s90lcvxne0iu" class="article-share-link">Share</a>
       
       
     </footer>

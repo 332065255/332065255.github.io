@@ -68,11 +68,138 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>其实as3已经完全封装好了对flv编码的解析,但是做为一个视频行业的flash开发人员,还是需要了解一下flash对flv的解码基础.<br>首先flv文件,最基础的部分就是标签,一共分为3种标签,脚本标签,视频标签,和声音标签</p>
+<p><img src="http://gao11.cn/blog/content/uploadfile/201605/ea331462879646.jpg" alt="此处输入图片的描述"></p>
+<p>详细的标签格式如下</p>
+<p><img src="http://gao11.cn/blog/content/uploadfile/201605/00911462879784.jpg" alt="此处输入图片的描述"></p>
+<p>从上面可以看出,flv的编码是顺序的, 头-&gt;上个包体大小-&gt;标签-&gt;上个包体大小-&gt;标签-&gt;上个包体大小<br>我们就可以根据这个顺序,解析出flv的每个标签的数据</p>
+<pre><code> package
+{
+    import flash.display.Sprite;
+    import flash.events.Event;
+    import flash.events.MouseEvent;
+    import flash.net.FileReference;
+    import flash.net.URLLoader;
+    import flash.net.URLLoaderDataFormat;
+    import flash.net.URLRequest;
+    import flash.net.URLRequestMethod;
+    import flash.utils.ByteArray;
+
+    /**
+     *flv解码 
+     * @author gaoyiyi
+     * 
+     */    
+    public class flvParse extends Sprite
+    {
+        private var load:URLLoader;
+        private var index:int;
+        private var sum:int;
+        private var body_sum:int;
+        private var label_sum:int;
+        private var _str:String;
+        private var result:ByteArray;
+        private var filere:FileReference;
+        public function flvParse()
+        {
+            filere=new FileReference();
+            load=new URLLoader();
+            load.dataFormat=URLLoaderDataFormat.BINARY;
+            load.load(new URLRequest(&quot;2.flv&quot;));
+            load.addEventListener(Event.COMPLETE,lis);
+            this.stage.addEventListener(MouseEvent.CLICK,lis2);
+        }
+        private function lis2(e:Event):void
+        {
+            filere.save(result,&quot;2.flv&quot;);
+        }
+        private function lis(e:Event):void
+        {
+            parse(load.data as ByteArray);
+        }
+        private function parse(by:ByteArray):void
+        {
+            trace(by.length);
+            var byte:ByteArray=by;
+            byte.position=13;
+            index=13;
+//            trace(byte[13].toString(16));
+            while(index&lt;byte.length&amp;&amp;index!=-1)
+            {
+                index=next(byte,index);
+            }
+        }
+        private function saveBy(b2:ByteArray,index:int):void{
+            result=new ByteArray();
+            b2.position=0;
+            b2.readBytes(result,0,index+1);
+            trace(result);
+        }
+        private function next(by:ByteArray,_index:int):int{
+            sum=0;
+            _str=&quot;&quot;;
+            sum+=1;
+            trace(&quot;当前标签类型:&quot;+by[_index].toString(16))
+
+            /////解码body大小
+            _index+=1;
+            _str+=(by[_index].toString(16).length==1?&quot;0&quot;+by[_index].toString(16):by[_index].toString(16));
+            _index+=1;
+            _str+=(by[_index].toString(16).length==1?&quot;0&quot;+by[_index].toString(16):by[_index].toString(16));
+            _index+=1;
+            _str+=(by[_index].toString(16).length==1?&quot;0&quot;+by[_index].toString(16):by[_index].toString(16));
+            body_sum=parseInt(_str,16);
+            trace(&quot;这个包体数据大小是&quot;,body_sum,_str);
+            if(by.length&lt;body_sum+_index)
+            {
+                saveBy(by,_index-4);
+                return -1;
+            }
+            sum+=3;
+            /////
+            /////解码时间
+            _index+=4;
+            sum+=4;
+            /////
+            ////解码 stream id
+            _index+=3;
+            sum+=3;
+            /////
+            /////解码body
+            _index+=body_sum;
+            sum+=body_sum;
+            //////
+            ////解码这块标签的大小
+            _str=&quot;&quot;;
+            _index+=1;
+            _str+=(by[_index].toString(16).length==1?&quot;0&quot;+by[_index].toString(16):by[_index].toString(16));
+            _index+=1;
+            _str+=(by[_index].toString(16).length==1?&quot;0&quot;+by[_index].toString(16):by[_index].toString(16));
+            _index+=1;
+            _str+=(by[_index].toString(16).length==1?&quot;0&quot;+by[_index].toString(16):by[_index].toString(16));
+            _index+=1;
+            _str+=(by[_index].toString(16).length==1?&quot;0&quot;+by[_index].toString(16):by[_index].toString(16));
+            label_sum=parseInt(_str,16);
+            _index+=1;
+            trace(&quot;上个包体的总大小是:&quot;+label_sum)
+            if((label_sum-body_sum)!=11)
+            {
+
+                trace(&quot;出问题了 位置&quot;,_index,_str);
+                trace(&quot;这段代码为&quot;,by[_index].toString(16),by[_index+1].toString(16),by[_index+2].toString(16),by[_index+3].toString(16),by[_index+4].toString(16))
+                return -1;
+            }
+            trace(&quot;没出问题,位置&quot;,_index,_str)
+            return _index;
+        }
+    }
+}
+</code></pre><p><a href="https://github.com/332065255/FLVparse/" target="_blank" rel="external">github工程地址</a></p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/AS3-解析flv编码/" data-id="ciuozunfa0000lk0ld36e5b31" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/AS3-解析flv编码/" data-id="ciup03k450008s90lqn4vkm29" class="article-share-link">Share</a>
       
       
     </footer>
@@ -99,11 +226,17 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>本文章需要的技术有:flv编码</p>
+<p>现在的在线教育领域中,直播系统不仅仅发送视频,通常也伴随着控制数据的发送,例如:翻页,画图等数据,直播发起者在直播的过程中发送的视频数据,需要通过rtmp服务器进行传输,而直播过程中发送的控制数据,是通过tcp/ip的socket长连接,把数据发送到直播观看者的终端.视频数据和控制数据分别走的两条路线,如下图所示.<br>图示:<br><img src="http://gao111.top/blog/content/uploadfile/201605/41be1462880327.png" alt="4FA1E5D5-5EF9-4AB6-9FC6-6B4B9E1A3E60.png"><br>     现有的解决方案,因为发送视频和发送数据分别使用了两条发送线路,网络不稳定,视频传输要比普通控制数据耗时长,两条线路的传输质量不同,导致出现延迟等,结果就是x1+x2 ≠ y1+y2</p>
+<p>本提案需要解决的技术问题就是,让视频数据与控制数据同步到达观看者的终端      x1+x2 = y1+y2;<br>解决方法如下:<br>     1 要解决这个问题,要把两条传输线路合并为一条,就可以解决网络层级的不确定性.<br>2首先,先来看一下flv编码的格式<br>图示: <img src="http://gao111.top/blog/content/uploadfile/201605/thum-9a971462880330.png" alt="CBAB2C58-D5F3-4FB6-8B88-73470F2CDC65.png"><br>3.可以看出,一个flv文件中,只有一个文件头,和很多个标签组成,我们所看到的视频和听到的声音是视频标签和声音标签所解析的.</p>
+<p>4.而脚本标签,是可以发送基本数据的标签,包括数字,字符等数据.该脚本标签,现在的网页播放器中,只有actionscript技术才能解码运行这个标签.</p>
+<p>5.为了解决x1+x2=y1+y2,我们需要把2条的传输线路合并为1条传输线路,如图示<br><img src="http://gao111.top/blog/content/uploadfile/201605/c36f1462880326.png" alt="0E4A3E05-87F7-4F5E-A0C9-E36A5389CD7A.png"><br>6.我们把要发送的数据,插入进flv视频中,如下图所示<br><img src="http://gao111.top/blog/content/uploadfile/201605/thum-e6a41462880331.png" alt="EB4CA6C7-EEFF-4AC4-A7D1-CE2A05A44FCE.png"><br>7.这样,发送的数据,就和视频同一时间到达观看者的终端中</p>
+<p>8.解析控制数据标签,观看者终端播放这个flv格式的视频,按照flv播放的时间轴行进,如果解码碰到控制数据标签,即可以运行发送端发过来的控制数据,而这个控制数据,就是和视频在同一个时间轴中,不会出现提前或者延迟执行的情况.</p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/基于flv编码-来实现某些数据的直播数据时间同步问题/" data-id="ciuozung80009lk0lkylozxfq" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/基于flv编码-来实现某些数据的直播数据时间同步问题/" data-id="ciup03k470009s90lnl289ez5" class="article-share-link">Share</a>
       
       
     </footer>
@@ -130,11 +263,17 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>现在视频点播领域,播放点播视频,大部分解决方案都是一开始播放,视频就会完全下载.如下图<br>图示:<br>    <img src="http://gao111.top/blog/content/uploadfile/201605/c48e1462880565.png" alt="图片 1.png"><br>     只要用户一旦开始播放某个视频,那么这个视频就会完全下载下来.<br>四、现有技术的缺点及本申请提案要解决的技术问题<br>     现有的点播解决方案,一个视频如果有200mb大小,10分钟的市场,用户只观看了1分钟,那么完全下载完毕,就会浪费掉180mb的流量,而用户并没有看后面的9分钟,导致流量白白浪费.<br>本方法主要解决的就是,根据用户观看时长,逐步下载视频,防止用户中间关闭视频,浪费流量的情况.<br>五、本申请提案的技术方案的详细阐述<br>1  要解决这个问题,要应用flv文件本身的关键帧的原理,来按需加载这个flv视频文件.<br>2  flv视频文件有关键帧I帧(以下简称为I帧),每个flv视频都有I帧,标准的flv视频文件是2秒一个I帧,每个flv视频一共包含多少个I帧,会标明在flv视频文件头中.如下图所示<br>图示:<br><img src="http://gao111.top/blog/content/uploadfile/201605/d6fb1462880566.png" alt="图片 2.png"></p>
+<ol>
+<li>通过面向对象语言(actionScript)把flv文件头中的I帧信息拿出来,如上图,这个I帧数组长度为N.<br>4 解析这个I帧数组的每一个元素,如下图所示<br>图示:<br><img src="http://gao111.top/blog/content/uploadfile/201605/7b851462880566.png" alt="图片 3.png"><br>5 有了每一个I帧的数据开始位置和数据结束位置,就可以用二进制渐进式下载来下载这个flv文件,假设我们设定的是下载位置在用户所看I帧的后面第4帧,如下图所示<pre><code>图示:
+</code></pre>   <img src="http://gao111.top/blog/content/uploadfile/201605/f7bf1462880568.png" alt="图片 4.png"><pre><code>6 这样通过渐进式下载,用户既不会感觉到视觉上的卡顿等问题,也极大的节约了视频服务器流量消耗,如果用户点开视频,只看了1秒的视频,那么也只浪费一点点流量,不会把整个视频下载下来.
+</code></pre></li>
+</ol>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/基于flv-I帧的逻辑切片/" data-id="ciuozung60008lk0lkzxcg39c" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/基于flv-I帧的逻辑切片/" data-id="ciup03k410007s90lxw2rmnbh" class="article-share-link">Share</a>
       
       
     </footer>
@@ -161,11 +300,128 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p><img src="http://gao11.cn/blog/content/uploadfile/201605/thum-c9a31462881468.jpg" alt="QQ图片20141031164457.jpg"><br>效果就是这样的。写了一个类，返回点的数组，可以用任何文字，但是点间距最好不要写大。。写大就不像这个字了<br><img src="http://gao11.cn/blog/content/uploadfile/201605/thum-01c01462881471.jpg" alt="QQ图片20141031165020.jpg"><br>类似这样。。</p>
+<pre><code>package com
+{
+    import flash.display.Bitmap;
+    import flash.display.BitmapData;
+    import flash.display.Sprite;
+    import flash.geom.Point;
+    import flash.geom.Rectangle;
+    import flash.text.TextField;
+
+    public class AniMain extends Sprite
+    {
+        private static var txt:TextField=new TextField();
+        private static var _bit:BitmapData;
+        private static var _bmp:Bitmap;
+        private static var _algin:String;
+        private static var _rectH:int;
+        private static var _rectW:int;
+        /**
+         *白色原始图片 
+         */        
+        private static var _bit2:BitmapData;
+        /**
+         *复制的图片 
+         */        
+        private static var _bit3:BitmapData;
+        /**
+         *绘制整个场景
+         */        
+        private static var _bit4:BitmapData;
+        /**
+         * 
+         *po
+         */
+        private static var po:Point=new Point(0,0);
+        private static var po2:Point=new Point();
+        private static var rect:Rectangle=new Rectangle(1,1);
+        private static var arr:Array=new Array();
+        public function AniMain()
+        {
+            super();
+        }
+        public static function goPlay(dis:Sprite,str:String=&quot;一生一世都爱你&quot;,_w:int=-1,_h:int=-1):Array
+        {
+            txt.text=str;
+            txt.width=txt.textWidth+3;
+            txt.height=txt.textHeight+4;
+            txt.defaultTextFormat.color=0;
+            _bit=new BitmapData(txt.width,txt.height);
+            _bit.draw(txt);
+            _bmp=new Bitmap(_bit);
+            _algin=_bmp.height&gt;_bmp.width?&quot;height&quot;:&quot;width&quot;;
+            if(_algin==&quot;height&quot;)
+            {
+                _bmp.width=(dis.stage.stageHeight/_bmp.height)*_bmp.width;
+                _bmp.height=dis.stage.stageHeight;
+
+            }
+            else
+            {
+                _bmp.height=(dis.stage.stageWidth/_bmp.width)*_bmp.height;
+                _bmp.width=dis.stage.stageWidth;
+
+            }
+            _bmp.x=(dis.stage.stageWidth-_bmp.width)/2;
+            _bmp.y=(dis.stage.stageHeight-_bmp.height)/2;
+            if(_w==-1&amp;&amp;_h==-1)
+            {
+            _rectH=_bmp.height/_bmp.bitmapData.height;
+            _rectW=_bmp.width/_bmp.bitmapData.width;
+            }
+            else
+            {
+                _rectH=_h;
+                _rectW=_w;
+            }
+            rect.width=_rectW;
+            rect.height=_rectH;
+            dis.addChild(_bmp);
+            _bmp.alpha=1;
+            _bit4=new BitmapData(dis.stage.stageWidth,dis.stage.stageHeight);
+            _bit4.draw(dis);
+            _bit2=new BitmapData(_rectW,_rectH,true,0xffffff);
+            arr=[];
+            for(var i:int=0;i&lt;_bit4.height;i+=_rectH)
+            {
+                for(var j:int=0;j&lt;_bit4.width;j+=_rectW)
+                {
+                    rect.x=j;
+                    rect.y=i;
+                    _bit2.copyPixels(_bit4,rect,po2);
+
+                    if(isHave(_bit2))
+                    {
+                        arr.push([rect.x,rect.y]);
+                    }
+                }
+            }
+            return arr;
+        }
+        private static function isHave(bit:BitmapData):Boolean
+        {
+            for(var i:int=0;i&lt;bit.width;i++)
+            {
+                for(var j:int=0;j&lt;bit.height;j++)
+                {
+                    if(bit.getPixel(i,j)==0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+}
+</code></pre><p>源码献上</p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/ActionScript-3-发个小玩意，可能会用于图形汇集成文本的应用/" data-id="ciuozunff0001lk0l9qkb0rm6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/ActionScript-3-发个小玩意，可能会用于图形汇集成文本的应用/" data-id="ciup03k3j0000s90lxq0b9q8g" class="article-share-link">Share</a>
       
       
     </footer>
@@ -192,11 +448,14 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>首先来看一下flv编码中metadata标签的16进制数据</p>
+<p><img src="http://s3.tupianku.com/view/large/10458/A6DDDD3CF83AED10B8E9D151A12D6BA2.jpg" alt="此处输入图片的描述"></p>
+<p>从第一个字节开始分析,<br>0x12  :script data  ///这是一个脚本标签<br>0x00 00 B7 ///代表了body大小<br>0x00 00 00 00 //基础时间戳+扩展时间戳<br>0x00 00 00 //代表了streamid 这个总是0<br>以上是Tag header的分析<br>下面进入Tag body分析<br>0x02 //表示amf包类型,0x02是字符串类型<br>0x00 0A //代表字符串的长度<br>0x6F 6E 4D 65 74 61 44 61 74 61 //翻译过来就是 o n M e t a D a t a    Ps 是不是很熟悉,这就是onMetaData方法<br>0x08  //代表amf包类型,0x08是一个数组类型<br>0x00 00 00 08 //代表数组长度 这的值为8长度<br>下面开始解析键值对<br>键解析:<br>0x00 08//第一个元素的key的长度 为8<br>0x64 75 72 61 74 69 6F 6E //翻译过来就是d u r a t i o n   Ps 这就是时长的字段<br>值解析:<br><img src="http://s3.tupianku.com/view/large/10458/37A37DA4-A5C5-4663-8587-733A77BE0F3D.png" alt="此处输入图片的描述"><br>0x00  // double双精度浮点类型<br>0x40 24 2b 02 0C 49 BA 5E //双精度 IEEE 754 浮点数  浮点数换算<a href="http://baike.baidu.com/link?url=6irpuDDtpbkiiHmSBgVzZVdD5PBDbA_0XeNRZONgBitjrWAexefyz0kzEqcvbC64BrowPJ2vi3LHJmHu4Jlr7VDoqHUDh_UKs1SHVAC9bHU61LpdAv4GmkSo1VEHR2ecWpbQR_e1FB99EeGqwjlAeXTsH-RZm5dS8_InlXFFKY3" target="_blank" rel="external">http://baike.baidu.com/link?url=6irpuDDtpbkiiHmSBgVzZVdD5PBDbA_0XeNRZONgBitjrWAexefyz0kzEqcvbC64BrowPJ2vi3LHJmHu4Jlr7VDoqHUDh_UKs1SHVAC9bHU61LpdAv4GmkSo1VEHR2ecWpbQR_e1FB99EeGqwjlAeXTsH-RZm5dS8_InlXFFKY3</a><br>0x00 05 //第二个key的长度<br>0x77 69 64 74 68 //翻译过来就是w i d t h  这就是视频的宽度<br>0x00  // double双精度浮点类型<br>0x40 74  00 00 00 00 00 00//双精度 IEEE 754 浮点数 宽度的值<br>0x 00 06//第三个key的长度<br>0x 68 65 69 57 68 74 //双精度 IEEE 754 浮点数 翻译过来 h e i g h t 这就是视频的高度<br>……………..略</p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/onMetadata方法是如何被触发的-在flv编码中是什么样的存在/" data-id="ciuozung20007lk0lvf87i7cv" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/onMetadata方法是如何被触发的-在flv编码中是什么样的存在/" data-id="ciup03k3z0006s90luupd9qjv" class="article-share-link">Share</a>
       
       
     </footer>
@@ -223,11 +482,55 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <blockquote>
+<p>继续上次的技术研究<br>        本次研究主要是基于youtube的html5直播播放,这种技术便于大规模应用直播,读取静态切片文件,不受限与服务器的连接数.<br>        这个技术的核心api是Mediasource.<br>        首先来看代码<br>        这一段代码是一个加载一个.mp4文件的代码,而直播是加载连续的.mp4文件的片段,道理上是一样的</p>
+</blockquote>
+<pre><code>var video = document.querySelector(&apos;video&apos;);
+
+var assetURL = &apos;frag_bunny.mp4&apos;;    
+// Need to be specific for Blink regarding codecs
+// ./mp4info frag_bunny.mp4 | grep Codec
+var mimeCodec = &apos;video/mp4; codecs=&quot;avc1.42E01E, mp4a.40.2&quot;&apos;;
+
+if (&apos;MediaSource&apos; in window &amp;&amp; MediaSource.isTypeSupported(mimeCodec)) {
+  var mediaSource = new MediaSource;
+  //console.log(mediaSource.readyState); // closed
+  video.src = URL.createObjectURL(mediaSource);
+  mediaSource.addEventListener(&apos;sourceopen&apos;, sourceOpen);
+} else {
+  console.error(&apos;Unsupported MIME type or codec: &apos;, mimeCodec);
+}
+
+function sourceOpen (_) {
+  //console.log(this.readyState); // open
+  var mediaSource = this;
+  var sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
+  fetchAB(assetURL, function (buf) { ///mp4文件加载成功
+    sourceBuffer.addEventListener(&apos;updateend&apos;, function (_) {
+      mediaSource.endOfStream();
+      video.play();
+      //console.log(mediaSource.readyState); // ended
+    });
+    sourceBuffer.appendBuffer(buf); ///把mp4文件追加到对象中
+  });
+};
+
+function fetchAB (url, cb) {    ///加载mp4文件,加载完成后回调方法
+  console.log(url);
+  var xhr = new XMLHttpRequest;
+  xhr.open(&apos;get&apos;, url);
+  xhr.responseType = &apos;arraybuffer&apos;;
+  xhr.onload = function () {
+    cb(xhr.response);
+  };
+  xhr.send();
+};
+</code></pre><p><a href="http://nickdesaulniers.github.io/netfix/demo/bufferAll.html" target="_blank" rel="external">http://nickdesaulniers.github.io/netfix/demo/bufferAll.html</a>      demo的网址</p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/html5-pc端直播可能性研究-二/" data-id="ciuozung00006lk0lpyt665lb" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/html5-pc端直播可能性研究-二/" data-id="ciup03k3w0005s90lcvxne0iu" class="article-share-link">Share</a>
       
       
     </footer>
@@ -254,11 +557,17 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <pre><code>前两天,chrome宣布,即将主动屏蔽flash,所有视频网站如果有html5形式的就默认使用html5,如果没有,则由客户选择是否开启.....简直不给flash留活路,我的大flash.......adobe真是作大死..
+牢骚归牢骚,但是饭还是得吃...万一flash真跪了,那网页端的视频直播怎么搞是个问题.
+html5在手机端,可以直接加载.m3u8的文件进行视频直播,延迟较高,但是手机端可用,但是pc端不支持html5直播啊.
+我就去油管上看了看油管的直播,根据network查看,看到了很多有用的信息.youtube也是通过加载切片形式来直播的,video标签里面,src播放的blob大数据,由此推测,youtube是依次下载切片,然后把每一个分片通过js解码输入到blob大数据中,让video标签实现直播的功能,但是这样做视频延迟也非常高,大概35秒左右,在pc网页端是个大问题.
+另外一种html5直播的方式是通过websocket方式进行直播,后台把音视频数据通过websocket发给网页端,网页端进行解码,这种方式延迟可以保证,但是对于服务器压力非常大,长连接数量多了不是闹着玩的.
+未完待续...
+</code></pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/html5-pc端直播可能性研究-一/" data-id="ciuozunfx0005lk0l86tdlh4w" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/html5-pc端直播可能性研究-一/" data-id="ciup03k3u0004s90lzo9am2q4" class="article-share-link">Share</a>
       
       
     </footer>
@@ -285,11 +594,13 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p><a href="https://github.com/332065255/GVideo" target="_blank" rel="external">github工程地址</a></p>
+<p><a href="gao11.cn/H5VideoDemo.html">Demo地址</a></p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/H5-点播播放器/" data-id="ciuozunfs0003lk0lrwjb8h4y" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/H5-点播播放器/" data-id="ciup03k3q0002s90lxhtec6ab" class="article-share-link">Share</a>
       
       
     </footer>
@@ -316,11 +627,12 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p>终于实现了html5的flv直播,虽然不是很稳定,但是从理论上证明了这是可行的<br>工程只能运行在chrome和firefox,需要fetch api支持,因为这个api的出现,才有了流式下载的可能性,终于和flash的urlstream一样了.<br>然后将下载下来的flv数据,整理成tag,进行在线封装mp4,再导入到video标签播放<br><a href="https://github.com/332065255/H5Live" target="_blank" rel="external">github工程地址</a></p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/Html5-flv直播/" data-id="ciuozunfu0004lk0l93dyly26" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/Html5-flv直播/" data-id="ciup03k3t0003s90lnfvz478b" class="article-share-link">Share</a>
       
       
     </footer>
@@ -347,11 +659,13 @@
   <div class="article-inner">
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <p><a href="https://github.com/332065255/FLVLiveMonitor" target="_blank" rel="external">https://github.com/332065255/FLVLiveMonitor</a><br>实时分析flv流,看直播是否出问题</p>
+<p><img src="http://gao111.top/img/2.jpg" alt="示例"></p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/25/FLV直播流实时监测器/" data-id="ciuozunfq0002lk0l4wnwm7dl" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/25/FLV直播流实时监测器/" data-id="ciup03k3o0001s90lk7oiilha" class="article-share-link">Share</a>
       
       
     </footer>
